@@ -26,6 +26,6 @@ module cmp_32(  input [31:0] a,
     wire GE  = ctrl == cmp_GE ; 
     wire GEU = ctrl == cmp_GEU;
 
-    assign c = ();          //to fill sth. in ()
+    assign c = res_EQ & EQ | res_NE & NE | res_LT & LT | res_LTU & LTU | res_GE & GE | res_GEU & GEU;       //to fill sth. in ()
 
 endmodule
