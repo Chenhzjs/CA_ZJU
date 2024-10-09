@@ -34,10 +34,16 @@ module HazardDetectionUnit(
     assign forward_ctrl_A = {2{rs1_forward_1}} & 2'd1 | {2{rs1_forward_2}} & 2'd2 | {2{rs1_forward_3}} & 2'd3;
     assign forward_ctrl_B = {2{rs2_forward_1}} & 2'd1 | {2{rs2_forward_2}} & 2'd2 | {2{rs2_forward_3}} & 2'd3;
     assign forward_ctrl_ls = rs2_EXE == rd_MEM && hazard_optype_EXE == hazard_optype_STORE && hazard_optype_MEM == hazard_optype_LOAD;
+    wire load_stall = rs1_forward_stall | rs2_forward_stall;
 
     assign PC_EN_IF = ~load_stall;
+    assign reg_FD_EN = 1;
+    assign reg_DE_EN = 1;
+    assign reg_EM_EN = 1;
+    assign reg_MW_EN = 1;
     assign reg_FD_stall = load_stall;
     assign reg_FD_flush = Branch_ID;
     assign reg_DE_flush = load_stall;
+    assign reg_EM_flush = 0;
 
 endmodule

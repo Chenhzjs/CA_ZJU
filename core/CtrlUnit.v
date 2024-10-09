@@ -72,7 +72,7 @@ module CtrlUnit(
     wire SH = Sop & funct3_1;                             //to fill sth. in 
     wire SW = Sop & funct3_2;                             //to fill sth. in 
 
-;
+
     wire LUI   = opcode == 7'b0110111;                          //to fill sth. in 
     wire AUIPC = opcode == 7'b0010111;                          //to fill sth. in 
 
@@ -99,8 +99,13 @@ module CtrlUnit(
                     {3{S_valid}}                  & Imm_type_S |
                     {3{LUI | AUIPC}}              & Imm_type_U ;
 
-
-    assign cmp_ctrl = BEQ | BNE | BLT | BGE | BLTU | BGEU;                         //to fill sth. in 
+    parameter cmp_EQ  = 3'b001;
+    parameter cmp_NE  = 3'b010;
+    parameter cmp_LT  = 3'b011;
+    parameter cmp_LTU = 3'b100;
+    parameter cmp_GE  = 3'b101;
+    parameter cmp_GEU = 3'b110;
+    assign cmp_ctrl = {3{BEQ}} & cmp_EQ | {3{BNE}} & cmp_NE | {3{BLT}} & cmp_LT | {3{BLTU}} & cmp_LTU | {3{BGE}} & cmp_GE | {3{BGEU}} & cmp_GEU ;                         //to fill sth. in 
 
     assign ALUSrc_A = JAL | JALR | AUIPC;                         //to fill sth. in 
 
@@ -143,6 +148,6 @@ module CtrlUnit(
 
     assign rs2use = R_valid | B_valid | S_valid;                         //to fill sth. in 
 
-    assign hazard_optype = {L_valid | S_valid, R_valid | I_valid | JAL | JALR | LUI | AUIPC | S_valid};                  //to fill sth. in 
+     assign hazard_optype = {L_valid | S_valid, R_valid | I_valid | JAL | JALR | LUI | AUIPC | S_valid};                  //to fill sth. in 
 
 endmodule

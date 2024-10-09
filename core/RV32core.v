@@ -8,7 +8,34 @@ module  RV32core(
         output[31:0] debug_data,  // debug data
         input clk,  // main clock
         input rst,  // synchronous reset
-        input interrupter  // interrupt source, for future use
+        input interrupter,  // interrupt source, for future use
+        output [31:0] PC_IF_debug,
+        output [31:0] inst_IF_debug,
+        output [31:0] PC_ID_debug,
+        output [31:0] inst_ID_debug,
+        output [31:0] PC_EXE_debug,
+        output [31:0] inst_EXE_debug,
+        output [31:0] PC_MEM_debug,
+        output [31:0] inst_MEM_debug,
+        output [31:0] PC_WB_debug,
+        output [31:0] inst_WB_debug,
+        output Branch_ctrl_debug,
+        output JALR_debug,
+        output RegWrite_debug,
+        output mem_w_ctrl_debug,
+        output MIO_ctrl_debug,
+        output ALUSrc_A_ctrl_debug,
+        output ALUSrc_B_ctrl_debug,
+        output DatatoReg_ctrl_debug,
+        output rs1use_ctrl_debug,
+        output rs2use_ctrl_debug,
+        output [1:0] hazard_optype_ctrl_debug,
+        output [2:0] ImmSel_ctrl_debug,
+        output [3:0] ALUControl_ctrl_debug,
+        output [1:0] forward_ctrl_A_debug,
+        output [1:0] forward_ctrl_B_debug,
+        output forward_ctrl_ls_debug,
+        output PC_EN_IF_debug
     );
 
     wire debug_clk;
@@ -16,7 +43,7 @@ module  RV32core(
     debug_clk clock(.clk(clk),.debug_en(debug_en),.debug_step(debug_step),.debug_clk(debug_clk));
 
     wire Branch_ctrl, JALR, RegWrite_ctrl, mem_w_ctrl, MIO_ctrl,
-        ALUSrc_A_ctrl, ALUSrc_B_ctrl, DatatoReg_ctrl, rs1use_ctrl, rs2use_ctrl;
+    ALUSrc_A_ctrl, ALUSrc_B_ctrl, DatatoReg_ctrl, rs1use_ctrl, rs2use_ctrl;
     wire[1:0] hazard_optype_ctrl;
     wire[2:0] ImmSel_ctrl, cmp_ctrl;
     wire[3:0] ALUControl_ctrl;
@@ -49,13 +76,40 @@ module  RV32core(
     wire[4:0] rd_WB;
     wire [31:0] wt_data_WB, PC_WB, inst_WB, ALUout_WB, Datain_WB;
 
+    assign PC_IF_debug = PC_IF;
+    assign inst_IF_debug = inst_IF;
+    assign PC_ID_debug = PC_ID;
+    assign inst_ID_debug = inst_ID;
+    assign PC_EXE_debug = PC_EXE;
+    assign inst_EXE_debug = inst_EXE;
+    assign PC_MEM_debug = PC_MEM;
+    assign inst_MEM_debug = inst_MEM;
+    assign PC_WB_debug = PC_WB;
+    assign inst_WB_debug = inst_WB;
+    assign Branch_ctrl_debug = Branch_ctrl;
+    assign JALR_debug = JALR;
+    assign RegWrite_debug = RegWrite_ctrl;
+    assign mem_w_ctrl_debug = mem_w_ctrl;
+    assign MIO_ctrl_debug = MIO_ctrl;
+    assign ALUSrc_A_ctrl_debug = ALUSrc_A_ctrl;
+    assign ALUSrc_B_ctrl_debug = ALUSrc_B_ctrl;
+    assign DatatoReg_ctrl_debug = DatatoReg_ctrl;
+    assign rs1use_ctrl_debug = rs1use_ctrl;
+    assign rs2use_ctrl_debug = rs2use_ctrl;
+    assign hazard_optype_ctrl_debug = hazard_optype_ctrl;
+    assign ImmSel_ctrl_debug = ImmSel_ctrl;
+    assign ALUControl_ctrl_debug = ALUControl_ctrl;
+    assign forward_ctrl_A_debug = forward_ctrl_A;
+    assign forward_ctrl_B_debug = forward_ctrl_B;
+    assign forward_ctrl_ls_debug = forward_ctrl_ls;
+    assign PC_EN_IF_debug = PC_EN_IF;
 
     // IF
     REG32 REG_PC(.clk(debug_clk),.rst(rst),.CE(PC_EN_IF),.D(next_PC_IF),.Q(PC_IF));
     
     add_32 add_IF(.a(PC_IF),.b(32'd4),.c(PC_4_IF));
 
-    MUX2T1_32 mux_IF(.I0(PC_4_IF),.I1(jump_PC_ID),.s(Branch_ctrl),.o(PC_IF));        //to fill sth. in ()
+    MUX2T1_32 mux_IF(.I0(PC_4_IF),.I1(jump_PC_ID),.s(Branch_ctrl),.o(next_PC_IF));        //to fill sth. in ()
 
     ROM_D inst_rom(.a(PC_IF[8:2]),.spo(inst_IF));
 
@@ -79,11 +133,11 @@ module  RV32core(
     
     ImmGen imm_gen(.ImmSel(ImmSel_ctrl),.inst_field(inst_ID),.Imm_out(Imm_out_ID));
     
-    MUX4T1_32 mux_forward_A(.I0(),.I1(),.I2(),.I3(),        //to fill sth. in ()
-        .s(),.o());
+    MUX4T1_32 mux_forward_A(.I0(rs1_data_reg),.I1(ALUout_EXE),.I2(ALUout_MEM),.I3(Datain_MEM),        //to fill sth. in ()
+        .s(forward_ctrl_A),.o(rs1_data_ID));
     
-    MUX4T1_32 mux_forward_B(.I0(),.I1(),.I2(),.I3(),        //to fill sth. in ()
-        .s(),.o());
+    MUX4T1_32 mux_forward_B(.I0(rs2_data_reg),.I1(ALUout_EXE),.I2(ALUout_MEM),.I3(Datain_MEM),        //to fill sth. in ()
+        .s(forward_ctrl_B),.o(rs2_data_ID));
     
     MUX2T1_32 mux_branch_ID(.I0(PC_ID),.I1(rs1_data_ID),.s(JALR),.o(addA_ID));
 
@@ -121,7 +175,7 @@ module  RV32core(
     ALU alu(.A(ALUA_EXE),.B(ALUB_EXE),.Control(ALUControl_EXE),
         .res(ALUout_EXE),.zero(ALUzero_EXE),.overflow(ALUoverflow_EXE));
     
-   MUX2T1_32 mux_forward_EXE(.I0(),.I1(),.s(),.o());        //to fill sth. in ()
+   MUX2T1_32 mux_forward_EXE(.I0(rs2_data_EXE),.I1(Datain_MEM),.s(forward_ctrl_ls),.o(Dataout_EXE));        //to fill sth. in ()
 
 
     // MEM
