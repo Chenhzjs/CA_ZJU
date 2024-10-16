@@ -148,6 +148,6 @@ module CtrlUnit(
 
     assign rs2use = R_valid | B_valid | S_valid;                         //to fill sth. in 
 
-     assign hazard_optype = {L_valid | S_valid, R_valid | I_valid | JAL | JALR | LUI | AUIPC | S_valid};                  //to fill sth. in 
+    assign hazard_optype = {L_valid | S_valid, R_valid | I_valid | JAL | JALR | LUI | AUIPC | S_valid};                  //to fill sth. in 
 
 endmodule
