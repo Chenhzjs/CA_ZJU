@@ -44,8 +44,8 @@ module ExceptionUnit(
 
     reg[1:0] cur_state, next_state;
     
-    wire exception = illegal_inst || l_access_fault || s_access_fault || ecall_m;
-    wire trap_in = exception || interrupt;
+    wire exception = illegal_inst | l_access_fault | s_access_fault | ecall_m;
+    wire trap_in = exception | interrupt & mstatus[3];
     reg[31:0] epc, cause;
     // reg flush;
     reg flush_FD, flush_DE, flush_EM, flush_MW;
@@ -78,7 +78,6 @@ module ExceptionUnit(
             STATE_IDLE:
             begin
                 if(trap_in) begin
-                    csr_raddr = 12'b001100000101; // 0x305 read mtvec
                     csr_waddr = 12'b001100000000; // 0x305 write mstatus
                     csr_wdata = {24'b0, mstatus[3], 3'b0, 1'b0, 3'b0};
                     csr_wsc = 2'b01;
@@ -146,6 +145,7 @@ module ExceptionUnit(
                     csr_wdata = (csr_w_imm_mux == 1)? {27'b0, csr_w_data_imm} : csr_w_data_reg;
                     next_state = STATE_IDLE;
                     RegWrite_cancel_reg = 1'b0;
+                    redirect_mux_reg = 0;
                 end
                 else begin
                     flush_DE = 0;
@@ -162,7 +162,7 @@ module ExceptionUnit(
             begin
                 flush_DE = 0;
                 flush_EM = 0;
-                flush_MW = 0;
+                flush_MW = 1;
                 flush_FD = 1;
                 // RegWrite_cancel_reg = 0;
                 redirect_mux_reg = 1;
@@ -180,7 +180,6 @@ module ExceptionUnit(
                 flush_EM = 0;
                 flush_MW = 0;
                 flush_FD = 0;
-                csr_raddr = 12'b001101000001; // 0x341 read mepc
                 csr_waddr = 12'b001101000010; // 0x342 write mcause
                 csr_wdata = cause;
                 csr_wsc = 2'b01;
