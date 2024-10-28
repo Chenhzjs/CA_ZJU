@@ -8,7 +8,20 @@ module  RV32core(
         output[31:0] debug_data,  // debug data
         input clk,  // main clock
         input rst,  // synchronous reset
-        input interrupter  // interrupt source, for future use
+        input interrupter,  // interrupt source, for future use
+        output [31:0] PC_IF_debug,
+        output [31:0] inst_IF_debug,
+        output [31:0] PC_MEM_debug,
+        output [31:0] inst_MEM_debug,
+        output [31:0] PC_WB_debug,
+        output [31:0] inst_WB_debug,
+        output redirect_mux_exp_debug,
+        output RegWrite_cancel_exp_debug,
+        output [31:0] PC_redirect_exp_debug,
+        output csr_rw_MEM_debug,
+        output csr_w_imm_mux_MEM_debug,
+        output [31:0] CSRout_MEM_debug,
+        output [3:0] exp_vector_WB_debug
 	);
 
 	wire debug_clk;
@@ -60,6 +73,19 @@ module  RV32core(
     wire[4:0] rd_WB;
     wire [31:0] wt_data_WB, PC_WB, inst_WB, ALUout_WB, Datain_WB;
 
+    assign PC_IF_debug = PC_IF;
+    assign inst_IF_debug = inst_IF;
+    assign PC_MEM_debug = PC_MEM;
+    assign inst_MEM_debug = inst_MEM;
+    assign PC_WB_debug = PC_WB;
+    assign inst_WB_debug = inst_WB;
+    assign redirect_mux_exp_debug = redirect_mux_exp;
+    assign RegWrite_cancel_exp_debug = RegWrite_cancel_exp;
+    assign PC_redirect_exp_debug = PC_redirect_exp;
+    assign csr_rw_MEM_debug = csr_rw_MEM;
+    assign csr_w_imm_mux_MEM_debug = csr_w_imm_mux_MEM;
+    assign CSRout_MEM_debug = CSRout_MEM;
+    assign exp_vector_WB_debug = exp_vector_WB;
 
     // IF
 	REG32 REG_PC(.clk(debug_clk),.rst(rst),.CE(PC_EN_IF),.D(final_PC_IF),.Q(PC_IF));
