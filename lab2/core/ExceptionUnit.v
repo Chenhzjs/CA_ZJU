@@ -51,8 +51,7 @@ module ExceptionUnit(
     reg flush_FD, flush_DE, flush_EM, flush_MW;
     reg RegWrite_cancel_reg;
     reg redirect_mux_reg;
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
+    initial begin
             cur_state <= STATE_IDLE;
             next_state <= STATE_IDLE;
             csr_raddr <= 12'b0;
@@ -60,19 +59,15 @@ module ExceptionUnit(
             csr_wdata <= 32'b0;
             csr_wsc <= 2'b0;
             csr_w <= 0;
-            flush_DE <= 0;
-            flush_EM <= 0;
-            flush_MW <= 0;
-            flush_FD <= 0;
             RegWrite_cancel_reg <= 1'b0;
             redirect_mux_reg <= 0;
             epc <= 32'b0;
             cause <= 32'b0;
-        end
-        else begin
+    end
+    always @(posedge clk) begin
+
             cur_state <= next_state;
         end
-    end
     always @* begin
         case(cur_state)
             STATE_IDLE:
@@ -82,14 +77,8 @@ module ExceptionUnit(
                     csr_wdata = {24'b0, mstatus[3], 3'b0, 1'b0, 3'b0};
                     csr_wsc = 2'b01;
                     csr_w = 1;
-                    next_state = STATE_MEPC;
-                    flush_DE = 1;
-                    flush_EM = 1;
-                    flush_MW = 1;
-                    flush_FD = 1;
-                    redirect_mux_reg = 0;
+                    next_state <= STATE_MEPC;
                     if (exception) begin
-                        RegWrite_cancel_reg = 1;
                         epc = epc_cur;
                         if (illegal_inst) begin
                             cause = {1'b0, 31'd2};
@@ -108,7 +97,6 @@ module ExceptionUnit(
                         end
                     end
                     else begin
-                        RegWrite_cancel_reg = 0;
                         epc = epc_next;
                         cause = {1'b1, 31'd0};
                     end
@@ -120,13 +108,7 @@ module ExceptionUnit(
                     csr_wdata = {24'b0, 1'b1, 3'b0, mstatus[7], 3'b0};
                     csr_wsc = 2'b01;
                     csr_w = 1;
-                    next_state = STATE_IDLE;
-                    flush_DE = 1;
-                    flush_EM = 1;
-                    flush_MW = 0;
-                    flush_FD = 1;
-                    redirect_mux_reg = 1;
-                    RegWrite_cancel_reg = 1'b0;
+                    next_state <= STATE_IDLE;
                 end
                 else if(csr_rw_in) begin
                     // input[1:0] csr_wsc_mode_in,
@@ -134,68 +116,45 @@ module ExceptionUnit(
                     // input[11:0] csr_rw_addr_in,
                     // input[31:0] csr_w_data_reg,
                     // input[4:0] csr_w_data_imm,
-                    flush_DE = 0;
-                    flush_EM = 0;
-                    flush_MW = 0;
-                    flush_FD = 0;
                     csr_w = 1;
                     csr_wsc = csr_wsc_mode_in;
                     csr_raddr = csr_rw_addr_in;
                     csr_waddr = csr_rw_addr_in;
                     csr_wdata = (csr_w_imm_mux == 1)? {27'b0, csr_w_data_imm} : csr_w_data_reg;
-                    next_state = STATE_IDLE;
-                    RegWrite_cancel_reg = 1'b0;
-                    redirect_mux_reg = 0;
+                    next_state <= STATE_IDLE;
                 end
                 else begin
-                    flush_DE = 0;
-                    flush_EM = 0;
-                    flush_MW = 0;
-                    flush_FD = 0;
                     csr_w = 0;
-                    next_state = STATE_IDLE;
-                    redirect_mux_reg = 0;
-                    RegWrite_cancel_reg = 1'b0;
+                    next_state <= STATE_IDLE;
                 end
             end
             STATE_MEPC:
             begin
-                flush_DE = 0;
-                flush_EM = 0;
-                flush_MW = 1;
-                flush_FD = 1;
                 // RegWrite_cancel_reg = 0;
-                redirect_mux_reg = 1;
                 csr_raddr = 12'b001100000101; // 0x305 read mtvec
                 csr_waddr = 12'b001101000001; // 0x341 write mepc
                 csr_wdata = epc;
                 csr_wsc = 2'b01;
                 csr_w = 1;
-                next_state = STATE_MCAUSE;
-                RegWrite_cancel_reg = 1'b0;
+                next_state <= STATE_MCAUSE;
             end
             STATE_MCAUSE:
             begin
-                flush_DE = 0;
-                flush_EM = 0;
-                flush_MW = 0;
-                flush_FD = 0;
                 csr_waddr = 12'b001101000010; // 0x342 write mcause
                 csr_wdata = cause;
                 csr_wsc = 2'b01;
                 csr_w = 1;
-                next_state = STATE_IDLE;
-                RegWrite_cancel_reg = 1'b0;
-                redirect_mux_reg = 0;
+                next_state <= STATE_IDLE;
+
             end
         endcase
     end
     assign PC_redirect = csr_r_data_out;
-    assign redirect_mux = redirect_mux_reg;
+    assign redirect_mux = mret | cur_state == STATE_MEPC;
 
-    assign reg_MW_flush = flush_MW;
-    assign reg_EM_flush = flush_EM;
-    assign reg_DE_flush = flush_DE;
-    assign reg_FD_flush = flush_FD;
-    assign RegWrite_cancel = RegWrite_cancel_reg;
+    assign reg_MW_flush = trap_in;
+    assign reg_EM_flush = trap_in | mret;
+    assign reg_DE_flush = trap_in | mret;
+    assign reg_FD_flush = trap_in | mret | cur_state == STATE_MEPC;
+    assign RegWrite_cancel = exception;
 endmodule
