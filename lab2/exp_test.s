@@ -1,5 +1,4 @@
-.global __start
-__start:
+
 addi x0, x0, 0
 lw x2, 4(x0)
 

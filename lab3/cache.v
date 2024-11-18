@@ -82,7 +82,7 @@ module cache (
     assign tag2 = inner_tag[addr_element2];                 //need to fill in
 
     assign hit1 = valid1 & (tag1 == addr_tag);
-    assign hit2 = valid2 & (tag2 == addr_tag);;                 //need to fill in
+    assign hit2 = valid2 & (tag2 == addr_tag);                 //need to fill in
 
     always @ (posedge clk) begin
         valid <= recent1? valid2 : valid1;                  //need to fill in
@@ -113,8 +113,8 @@ module cache (
                 
                 // inner_recent will be refreshed only on r/w hit
                 // (including the r/w hit after miss and replacement)
-                inner_recent[addr_element1] <= 1'b1;
-                inner_recent[addr_element2] <= 1'b0;
+                inner_recent[addr_element1] <= 1'b0;
+                inner_recent[addr_element2] <= 1'b1;
             end
         end
         else dout <= inner_data[ recent1 ? addr_word2 : addr_word1 ];
@@ -169,8 +169,8 @@ module cache (
                                     {word2[31:8], din[7:0]} // 00
                 ;
                 inner_dirty[addr_element2] <= 1'b1;
-                inner_recent[addr_element1] <= 1'b1;
-                inner_recent[addr_element2] <= 1'b0;//need to fill in
+                inner_recent[addr_element1] <= 1'b0;
+                inner_recent[addr_element2] <= 1'b1;//need to fill in
             end
         end
 
