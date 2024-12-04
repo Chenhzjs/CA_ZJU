@@ -189,6 +189,10 @@ module cmu (
     end
     assign mem_data_o = cache_dout;
 
+<<<<<<< HEAD
     assign stall = state != S_IDLE;
+=======
+    assign stall = next_state != S_IDLE;
+>>>>>>> 3acbf80dbc59c02a4c9f0a42b84522119fde565a
 
 endmodule
