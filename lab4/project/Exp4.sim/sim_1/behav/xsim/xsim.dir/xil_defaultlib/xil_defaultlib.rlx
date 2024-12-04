@@ -1,0 +1,12 @@
+0.7
+2020.2
+Oct 13 2023
+20:47:58
+C:/work_station/CA_ZJU/lab4/project/Exp4.sim/sim_1/behav/xsim/glbl.v,1732690470,verilog,,,,glbl,,,,,,,,
+C:/work_station/CA_ZJU/lab4/project/code/cache/addr_define.vh,1732690441,verilog,,,,,,,,,,,,
+C:/work_station/CA_ZJU/lab4/project/code/cache/cache.v,1732690441,verilog,,C:/work_station/CA_ZJU/lab4/project/code/cache/cmu.v,C:/work_station/CA_ZJU/lab4/project/code/cache/addr_define.vh,cache,,,../../../../code/auxillary;../../../../code/cache,,,,,
+C:/work_station/CA_ZJU/lab4/project/code/cache/cmu.v,1732690980,verilog,,C:/work_station/CA_ZJU/lab4/project/code/cache/sim/cmu_sim.v,C:/work_station/CA_ZJU/lab4/project/code/cache/addr_define.vh,cmu,,,../../../../code/auxillary;../../../../code/cache,,,,,
+C:/work_station/CA_ZJU/lab4/project/code/cache/sim/cmu_sim.v,1732690441,verilog,,C:/work_station/CA_ZJU/lab4/project/code/cache/sim/data_ram.v,,cmu_sim,,,../../../../code/auxillary;../../../../code/cache,,,,,
+C:/work_station/CA_ZJU/lab4/project/code/cache/sim/data_ram.v,1732690442,verilog,,C:/work_station/CA_ZJU/lab4/project/code/cache/sim/inst.v,,data_ram,,,../../../../code/auxillary;../../../../code/cache,,,,,
+C:/work_station/CA_ZJU/lab4/project/code/cache/sim/inst.v,1732690442,verilog,,C:/work_station/CA_ZJU/lab4/project/code/cache/sim/sim_top.v,,inst,,,../../../../code/auxillary;../../../../code/cache,,,,,
+C:/work_station/CA_ZJU/lab4/project/code/cache/sim/sim_top.v,1732690442,verilog,,,,sim_top,,,../../../../code/auxillary;../../../../code/cache,,,,,

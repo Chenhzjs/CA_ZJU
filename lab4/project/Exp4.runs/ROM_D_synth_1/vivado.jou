@@ -1,0 +1,14 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Wed Dec  4 16:36:19 2024
+# Process ID: 23980
+# Current directory: C:/work_station/CA_ZJU/lab4/project/Exp4.runs/ROM_D_synth_1
+# Command line: vivado.exe -log ROM_D.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source ROM_D.tcl
+# Log file: C:/work_station/CA_ZJU/lab4/project/Exp4.runs/ROM_D_synth_1/ROM_D.vds
+# Journal file: C:/work_station/CA_ZJU/lab4/project/Exp4.runs/ROM_D_synth_1\vivado.jou
+# Running On: chenhz_laptop, OS: Windows, CPU Frequency: 2304 MHz, CPU Physical cores: 8, Host memory: 34090 MB
+#-----------------------------------------------------------
+source ROM_D.tcl -notrace
